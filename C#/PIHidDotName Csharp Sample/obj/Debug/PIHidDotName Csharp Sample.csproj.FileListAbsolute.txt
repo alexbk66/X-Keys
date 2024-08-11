@@ -1,0 +1,11 @@
+C:\Program Files (x86)\PI Engineering\PI Engineering SDK\XK-24\C#\PIHidDotName Csharp Sample\bin\Debug\PIHidDotName Csharp Sample.exe
+C:\Program Files (x86)\PI Engineering\PI Engineering SDK\XK-24\C#\PIHidDotName Csharp Sample\bin\Debug\PIHidDotName Csharp Sample.pdb
+C:\Program Files (x86)\PI Engineering\PI Engineering SDK\XK-24\C#\PIHidDotName Csharp Sample\bin\Debug\PIEHid32Net.dll
+C:\Program Files (x86)\PI Engineering\PI Engineering SDK\XK-24\C#\PIHidDotName Csharp Sample\obj\Debug\PIHidDotName Csharp Sample.csproj.AssemblyReference.cache
+C:\Program Files (x86)\PI Engineering\PI Engineering SDK\XK-24\C#\PIHidDotName Csharp Sample\obj\Debug\PIHidDotName_Csharp_Sample.Form1.resources
+C:\Program Files (x86)\PI Engineering\PI Engineering SDK\XK-24\C#\PIHidDotName Csharp Sample\obj\Debug\PIHidDotName_Csharp_Sample.Properties.Resources.resources
+C:\Program Files (x86)\PI Engineering\PI Engineering SDK\XK-24\C#\PIHidDotName Csharp Sample\obj\Debug\PIHidDotName Csharp Sample.csproj.GenerateResource.cache
+C:\Program Files (x86)\PI Engineering\PI Engineering SDK\XK-24\C#\PIHidDotName Csharp Sample\obj\Debug\PIHidDotName Csharp Sample.csproj.CoreCompileInputs.cache
+C:\Program Files (x86)\PI Engineering\PI Engineering SDK\XK-24\C#\PIHidDotName Csharp Sample\obj\Debug\PIHidDotName Csharp Sample.csproj.CopyComplete
+C:\Program Files (x86)\PI Engineering\PI Engineering SDK\XK-24\C#\PIHidDotName Csharp Sample\obj\Debug\PIHidDotName Csharp Sample.exe
+C:\Program Files (x86)\PI Engineering\PI Engineering SDK\XK-24\C#\PIHidDotName Csharp Sample\obj\Debug\PIHidDotName Csharp Sample.pdb
