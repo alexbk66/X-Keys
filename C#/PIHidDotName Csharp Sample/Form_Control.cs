@@ -70,7 +70,6 @@ namespace PIHidDotName_Csharp_Sample
         }
 
 
-
         private void BtnRed_Click(object sender, EventArgs e)
         {
             //Turn on the red LED
@@ -369,6 +368,36 @@ namespace PIHidDotName_Csharp_Sample
                 else
                 {
                     toolStripStatusLabel1.Text = "Write Success - Set LED";
+                }
+            }
+        }
+
+
+        private void BtnSaveBL_Click(object sender, EventArgs e)
+        {
+            //Write current state of backlighting to EEPROM.  
+            //NOTE: Is it not recommended to do this frequently as there are a finite number of writes to the EEPROM allowed
+            if (selecteddevice != -1)
+            {
+
+                for (int j = 0; j < devices[selecteddevice].WriteLength; j++)
+                {
+                    wData[j] = 0;
+                }
+                wData[0] = 0;
+                wData[1] = 199;
+                wData[2] = 1; //anything other than 0 will save bl state to eeprom, default is 0
+
+                int result = 404;
+                while (result == 404) { result = devices[selecteddevice].WriteData(wData); }
+
+                if (result != 0)
+                {
+                    toolStripStatusLabel1.Text = "Write Fail: " + result;
+                }
+                else
+                {
+                    toolStripStatusLabel1.Text = "Write Success - Save Backlight to EEPROM";
                 }
             }
         }

@@ -22,6 +22,7 @@ namespace PIHidDotName_Csharp_Sample
                 //System.Media.SystemSounds.Beep.Play(); 
 
                 int cbocount = 0; //keeps track of how many valid devices were added to the CboDevice box
+
                 for (int i = 0; i < devices.Length; i++)
                 {
                     //information about device
@@ -31,43 +32,47 @@ namespace PIHidDotName_Csharp_Sample
                     //HID Version = devices[i].Version); //NOTE: this is NOT the firmware version which is given in the descriptor
                     int hidusagepg = devices[i].HidUsagePage;
                     int hidusage = devices[i].HidUsage;
-                    if (devices[i].HidUsagePage == 0xc && devices[i].WriteLength == 36)
+
+                    if (devices[i].HidUsagePage != 0xc || devices[i].WriteLength != 36)
                     {
-                        switch (devices[i].Pid)
-                        {
-                            case 1027:
-                                //Device 2 Keyboard, Joystick, Input and Output endpoints, PID #3
-                                CboDevices.Items.Add(devices[i].ProductString + " (" + devices[i].Pid + "=PID #1)");
-                                cbotodevice[cbocount] = i;
-                                cbocount++;
-                                break;
-                            case 1028:
-                                //Device 1 Keyboard, Joystick, Mouse and Output endpoints,. PID #2
-                                CboDevices.Items.Add(devices[i].ProductString + " (" + devices[i].Pid + "=PID #2)");
-                                cbotodevice[cbocount] = i;
-                                cbocount++;
-                                break;
-                            case 1029:
-                                //Device 0 Keyboard, Mouse, Input and Output endpoints (factory default), PID #1
-                                CboDevices.Items.Add(devices[i].ProductString + " (" + devices[i].Pid + "=PID #3)");
-                                cbotodevice[cbocount] = i;
-                                cbocount++;
-                                break;
-                            case 1249:
-                                //Device 3 Keyboard, Multimedia, Mouse and Output endpoints, PID #4
-                                CboDevices.Items.Add(devices[i].ProductString + " (" + devices[i].Pid + "=PID #4)");
-                                cbotodevice[cbocount] = i;
-                                cbocount++;
-                                break;
-                            default:
-                                CboDevices.Items.Add("Unknown Device: " + devices[i].ProductString + " (" + devices[i].Pid + ")");
-                                cbotodevice[cbocount] = i;
-                                cbocount++;
-                                break;
-                        }
-                        devices[i].SetupInterface();
-                        devices[i].suppressDuplicateReports = false;
+                        continue;
                     }
+
+                    switch (devices[i].Pid)
+                    {
+                        case 1027:
+                            //Device 2 Keyboard, Joystick, Input and Output endpoints, PID #3
+                            CboDevices.Items.Add(devices[i].ProductString + " (" + devices[i].Pid + "=PID #1)");
+                            cbotodevice[cbocount] = i;
+                            cbocount++;
+                            break;
+                        case 1028:
+                            //Device 1 Keyboard, Joystick, Mouse and Output endpoints,. PID #2
+                            CboDevices.Items.Add(devices[i].ProductString + " (" + devices[i].Pid + "=PID #2)");
+                            cbotodevice[cbocount] = i;
+                            cbocount++;
+                            break;
+                        case 1029:
+                            //Device 0 Keyboard, Mouse, Input and Output endpoints (factory default), PID #1
+                            CboDevices.Items.Add(devices[i].ProductString + " (" + devices[i].Pid + "=PID #3)");
+                            cbotodevice[cbocount] = i;
+                            cbocount++;
+                            break;
+                        case 1249:
+                            //Device 3 Keyboard, Multimedia, Mouse and Output endpoints, PID #4
+                            CboDevices.Items.Add(devices[i].ProductString + " (" + devices[i].Pid + "=PID #4)");
+                            cbotodevice[cbocount] = i;
+                            cbocount++;
+                            break;
+                        default:
+                            CboDevices.Items.Add("Unknown Device: " + devices[i].ProductString + " (" + devices[i].Pid + ")");
+                            cbotodevice[cbocount] = i;
+                            cbocount++;
+                            break;
+                    }
+
+                    devices[i].SetupInterface();
+                    devices[i].suppressDuplicateReports = false;
                 }
             }
 
