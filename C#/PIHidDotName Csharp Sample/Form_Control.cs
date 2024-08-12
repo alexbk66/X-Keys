@@ -10,6 +10,47 @@ namespace PIHidDotName_Csharp_Sample
 {
     public partial class Form1
     {
+        #region NEW
+
+
+        private void BtnRed_Click(object sender, EventArgs e)
+        {
+            //Turn on the red LED
+
+            int? result = CurrentDevice?.RedLED();
+
+            ShowResult(result, "Red LED");
+        }
+
+
+
+        private void ChkGreenLED_CheckStateChanged(object sender, EventArgs e)
+        {
+            int? result = CurrentDevice?.SetGreenLED((int)ChkGreenLED.CheckState);
+
+            ShowResult(result, "Green LED");
+        }
+
+
+        private void ChkRedLED_CheckStateChanged(object sender, EventArgs e)
+        {
+            int? result = CurrentDevice?.SetRedLED((int)ChkRedLED.CheckState);
+
+            ShowResult(result, "Red LED");
+        }
+
+
+        private void BtnBLToggle_Click(object sender, EventArgs e)
+        {
+            int? result = CurrentDevice?.ToggleBacklights();
+
+            ShowResult(result, "Toggle BL");
+        }
+
+
+        #endregion NEW
+
+
         private void ChkBLOnOff_CheckedChanged(object sender, EventArgs e)
         {
             //Use the Set Flash Freq to control frequency of blink
@@ -65,63 +106,6 @@ namespace PIHidDotName_Csharp_Sample
                 else
                 {
                     toolStripStatusLabel1.Text = "Write Success - Flash BL";
-                }
-            }
-        }
-
-
-        private void BtnRed_Click(object sender, EventArgs e)
-        {
-            //Turn on the red LED
-            if (selecteddevice != -1) //do nothing if not enumerated
-            {
-                byte saveled = wData[2]; //save the current value of the LED byte
-                for (int j = 0; j < devices[selecteddevice].WriteLength; j++)
-                {
-                    wData[j] = 0;
-                }
-                wData[1] = 186;
-                wData[2] = (byte)(saveled | 128);
-
-                int result = 404;
-                while (result == 404) { result = devices[selecteddevice].WriteData(wData); }
-
-                if (result != 0)
-                {
-                    toolStripStatusLabel1.Text = "Write Fail: " + result;
-                }
-                else
-                {
-                    toolStripStatusLabel1.Text = "Write Success-Red LED";
-                }
-            }
-
-        }
-
-
-        private void BtnBLToggle_Click(object sender, EventArgs e)
-        {
-            //Sending this command toggles the backlights
-            if (selecteddevice != -1) //do nothing if not enumerated
-            {
-                for (int j = 0; j < devices[selecteddevice].WriteLength; j++)
-                {
-                    wData[j] = 0;
-                }
-
-                wData[0] = 0;
-                wData[1] = 184;
-
-                int result = 404;
-                while (result == 404) { result = devices[selecteddevice].WriteData(wData); }
-
-                if (result != 0)
-                {
-                    toolStripStatusLabel1.Text = "Write Fail: " + result;
-                }
-                else
-                {
-                    toolStripStatusLabel1.Text = "Write Success-Toggle BL";
                 }
             }
         }
@@ -312,62 +296,6 @@ namespace PIHidDotName_Csharp_Sample
                 else
                 {
                     toolStripStatusLabel1.Text = "Write Success-All Red BL on/off";
-                }
-            }
-        }
-
-
-        private void ChkGreenLED_CheckStateChanged(object sender, EventArgs e)
-        {
-            if (selecteddevice != -1)
-            {
-
-                for (int j = 0; j < devices[selecteddevice].WriteLength; j++)
-                {
-                    wData[j] = 0;
-                }
-                wData[1] = 179; //0xb3
-                wData[2] = 6; //6 for green, 7 for red
-                wData[3] = (byte)ChkGreenLED.CheckState; //0=off, 1=on, 2=flash
-
-                int result = 404;
-                while (result == 404) { result = devices[selecteddevice].WriteData(wData); }
-
-                if (result != 0)
-                {
-                    toolStripStatusLabel1.Text = "Write Fail: " + result;
-                }
-                else
-                {
-                    toolStripStatusLabel1.Text = "Write Success - Set LED";
-                }
-            }
-        }
-
-
-        private void ChkRedLED_CheckStateChanged(object sender, EventArgs e)
-        {
-            if (selecteddevice != -1)
-            {
-
-                for (int j = 0; j < devices[selecteddevice].WriteLength; j++)
-                {
-                    wData[j] = 0;
-                }
-                wData[1] = 179; //0xb3
-                wData[2] = 7; //6 for green, 7 for red
-                wData[3] = (byte)ChkRedLED.CheckState; //0=off, 1=on, 2=flash
-
-                int result = 404;
-                while (result == 404) { result = devices[selecteddevice].WriteData(wData); }
-
-                if (result != 0)
-                {
-                    toolStripStatusLabel1.Text = "Write Fail: " + result;
-                }
-                else
-                {
-                    toolStripStatusLabel1.Text = "Write Success - Set LED";
                 }
             }
         }

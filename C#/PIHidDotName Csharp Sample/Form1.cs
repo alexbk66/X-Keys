@@ -18,10 +18,15 @@ namespace PIHidDotName_Csharp_Sample
 
 
         PIEDevice[] devices;
-        
+        PIEDeviceEx[] devicesex;
+
+        PIEDeviceEx CurrentDevice = null;
+
+
         int[] cbotodevice=null; //for each item in the CboDevice list maps this index to the device index.  Max devices =100 
         byte[] wData = null; //write data buffer
         int selecteddevice=-1; //set to the index of CboDevice
+
         long saveabsolutetime;  //for timestamp demo
 
         //for thread-safe way to call a Windows Forms control
@@ -29,6 +34,7 @@ namespace PIHidDotName_Csharp_Sample
         // the text property on a TextBox control.
         delegate void SetTextCallback(string text);
         Control c;
+
         //end thread-safe
         byte[] lastdata = null;
         
@@ -48,13 +54,13 @@ namespace PIHidDotName_Csharp_Sample
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             //closeinterfaces on all devices that have been setup (SetupInterface called)
-            for (int i = 0; i < CboDevices.Items.Count; i++)
+            if(devicesex != null)
+            foreach (PIEDeviceEx dev in devicesex)
             {
-                //if devices[].Connected=false don't call CloseInterface
-                devices[cbotodevice[i]].CloseInterface();
-
+                dev?.Dispose();
             }
-            System.Environment.Exit(0);
+
+            Environment.Exit(0);
         }
 
 
