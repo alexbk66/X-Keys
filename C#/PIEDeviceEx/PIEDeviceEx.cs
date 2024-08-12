@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -10,6 +11,7 @@ namespace PIEDeviceLib
     public class PIEDeviceEx : IDisposable, PIEDataHandler, PIEErrorHandler
     {
         #region Private Properties
+
 
         public enum EPid
         {
@@ -26,7 +28,6 @@ namespace PIEDeviceLib
         PIEDevice device;
 
         byte[] wData = null; //write data buffer
-        byte[] lastdata = null;
 
 
         #endregion Private Properties
@@ -43,6 +44,7 @@ namespace PIEDeviceLib
         public int Pid => device.Pid;
         public EPid PidType => (EPid)device.Pid;
 
+        public string SerialNumber => device.SerialNumberString;
         public string Model => device.ProductString;
         public int Version => device.Version;
 
@@ -62,6 +64,33 @@ namespace PIEDeviceLib
         {
             return dev?.HidUsagePage == 0xc && dev?.WriteLength == 36;
         }
+
+
+        public class MessageEventArgs : EventArgs
+        {
+            public MessageEventArgs(string msg, int? error = null)
+            {
+                this.msg = msg;
+                this.error = error;
+            }
+
+            public MessageEventArgs(byte[] data, int? error = null)
+            {
+                this.data = data;
+                this.error = error;
+            }
+
+            public string msg { get; set; }
+
+            public Byte[] data { get; set; }
+                
+            public int? error { get; set; }
+        }
+
+
+        public event EventHandler<MessageEventArgs> OnError;
+        public event EventHandler<MessageEventArgs> OnMessage;
+
 
         #endregion Public Properties
 
@@ -85,13 +114,14 @@ namespace PIEDeviceLib
                 wData = new byte[WriteLength];//size write array 
             }
 
-            if (lastdata == null)
-            {
-                lastdata = new byte[ReadLength];
-            }
-
             Array.Clear(wData, 0, wData.Length);
-            Array.Clear(lastdata, 0, lastdata.Length);
+
+            //if (lastdata == null)
+            //{
+            //    lastdata = new byte[ReadLength];
+            //}
+
+            //Array.Clear(lastdata, 0, lastdata.Length);
         }
 
 
@@ -174,13 +204,39 @@ namespace PIEDeviceLib
             }
         }
 
+        
+        DataStruct data_struct;
+        DataStruct? old_data_struct;
 
+
+        //data callback    
         void PIEDataHandler.HandlePIEHidData(byte[] data, PIEDevice sourceDevice, int error)
         {
+            Debug.Assert(sourceDevice?.Path == device?.Path);
+
+            try
+            {
+                data_struct = new DataStruct(data);
+
+                Button? changed = data_struct.Changed(old_data_struct);
+
+                old_data_struct = data_struct;
+            }
+            catch (Exception ex)
+            {
+                OnError?.Invoke(this, new MessageEventArgs($"Exception: {ex}"));
+            }
+
+        //    OnMessage?.Invoke(sourceDevice, new MessageEventArgs(data, error));
         }
 
-        void PIEErrorHandler.HandlePIEHidError(PIEDevice sourceDevices, int error)
+
+        //error callback
+        void PIEErrorHandler.HandlePIEHidError(PIEDevice sourceDevice, int error)
         {
+            Debug.Assert(sourceDevice?.Path == device?.Path);
+
+            OnError?.Invoke(this, new MessageEventArgs($"Error: {error}", error));
         }
 
 
@@ -188,6 +244,20 @@ namespace PIEDeviceLib
 
 
         #region Control Methods
+
+
+        /// <summary>
+        /// 177 (0xb1)
+        /// After sending this command a general incoming data report will be given with
+        /// the 3rd byte (Data Type) 2nd bit set.  If program switch is up byte 3 will be 2
+        /// and if it is pressed byte 3 will be 3.  This is useful for getting the initial state
+        /// or unit id of the device before it sends any data.
+        /// </summary>
+        /// <returns></returns>
+        public int GetDataNow()
+        {
+            return WriteData(0, 177);
+        }
 
 
         /// <summary>

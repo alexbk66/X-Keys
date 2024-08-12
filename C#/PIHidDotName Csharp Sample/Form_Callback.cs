@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 
 using PIEHid32Net;
+using static PIEDeviceLib.PIEDeviceEx;
+
 
 namespace PIHidDotName_Csharp_Sample
 {
@@ -16,13 +18,23 @@ namespace PIHidDotName_Csharp_Sample
         }
 
 
+        private void CurrentDevice_OnError(object sender, MessageEventArgs e)
+        {
+            this.SetToolStrip(e.msg);
+        }
+
+
+        private void CurrentDevice_OnMessage(object sender, MessageEventArgs e)
+        {
+            HandlePIEHidData(e.data, sender as PIEDevice, e.error ?? 0);
+        }
+
 
         //data callback    
         public void HandlePIEHidData(Byte[] data, PIEDevice sourceDevice, int error)
         {
-
             //check the sourceDevice and make sure it is the same device as selected in CboDevice   
-            if (sourceDevice == devices[selecteddevice])
+            //if (sourceDevice == devices[selecteddevice])
             {
                 //check the switch byte 
                 byte val2 = (byte)(data[2] & 1);
@@ -66,10 +78,12 @@ namespace PIHidDotName_Csharp_Sample
                         int keynum = 8 * i + j; //using key numbering in sdk; column 1 = 0,1,2... column 2 = 8,9,10... column 3 = 16,17,18... column 4 = 24,25,26... etc
                         byte temp2 = (byte)(data[i + 3] & temp1); //check using bitwise AND the current value of this bit. The + 3 is because the 1st button byte starts 3 bytes in at data[3]
                         byte temp3 = (byte)(lastdata[i + 3] & temp1); //check using bitwise AND the previous value of this bit
+                        
                         int state = 0; //0=was up, now up, 1=was up, now down, 2= was down, still down, 3= was down, now up
                         if (temp2 != 0 && temp3 == 0) state = 1; //press
                         else if (temp2 != 0 && temp3 != 0) state = 2; //held down
                         else if (temp2 == 0 && temp3 != 0) state = 3; //release
+
                         switch (state)
                         {
                             case 1: //key was up and now is pressed
@@ -85,7 +99,9 @@ namespace PIHidDotName_Csharp_Sample
                             case 3: //key was pressed and now released
                                 break;
                         }
-                        //Perform action based on key number, consult P.I. Engineering SDK documentation for the key numbers
+
+                        // Perform action based on key number,
+                        // consult P.I. Engineering SDK documentation for the key numbers
                         switch (keynum)
                         {
                             case 0: //button 0 (top left)
@@ -338,6 +354,7 @@ namespace PIHidDotName_Csharp_Sample
                         }
                     }
                 }
+
                 for (int i = 0; i < sourceDevice.ReadLength; i++)
                 {
                     lastdata[i] = data[i];
@@ -353,36 +370,6 @@ namespace PIHidDotName_Csharp_Sample
                 c = this.label20;
                 this.SetText("delta time: " + deltatime + " ms");
                 saveabsolutetime = absolutetime;
-            }
-        }
-
-        private void BtnGetDataNow_Click(object sender, EventArgs e)
-        {
-            //After sending this command a general incoming data report will be given with
-            //the 3rd byte (Data Type) 2nd bit set.  If program switch is up byte 3 will be 2
-            //and if it is pressed byte 3 will be 3.  This is useful for getting the initial state
-            //or unit id of the device before it sends any data.
-            if (selecteddevice != -1) //do nothing if not enumerated
-            {
-                for (int j = 0; j < devices[selecteddevice].WriteLength; j++)
-                {
-                    wData[j] = 0;
-                }
-
-                wData[0] = 0;
-                wData[1] = 177; //0xb1
-
-                int result = 404;
-                while (result == 404) { result = devices[selecteddevice].WriteData(wData); }
-
-                if (result != 0)
-                {
-                    toolStripStatusLabel1.Text = "Write Fail: " + result;
-                }
-                else
-                {
-                    toolStripStatusLabel1.Text = "Write Success - Generate Data";
-                }
             }
         }
     }
