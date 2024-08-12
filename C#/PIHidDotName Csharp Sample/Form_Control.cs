@@ -10,17 +10,14 @@ namespace PIHidDotName_Csharp_Sample
 {
     public partial class Form1
     {
-        #region NEW
-
-
-        private void BtnRed_Click(object sender, EventArgs e)
-        {
-            //Turn on the red LED
-
-            int? result = CurrentDevice?.RedLED();
-
-            ShowResult(result, "Red LED");
-        }
+        //private void BtnRed_Click(object sender, EventArgs e)
+        //{
+        //    //Turn on the red LED
+        //
+        //    int? result = CurrentDevice?.RedLED();
+        //
+        //    ShowResult(result, "Red LED");
+        //}
 
 
 
@@ -48,66 +45,33 @@ namespace PIHidDotName_Csharp_Sample
         }
 
 
-        #endregion NEW
-
-
-        private void ChkBLOnOff_CheckedChanged(object sender, EventArgs e)
+        /// <summary>
+        /// Key Index for XK-24 (in decimal)
+        /// Columns-->
+        ///   0   8   16  24
+        ///   1   9   17  25
+        ///   2   10  18  26
+        ///   3   11  19  27
+        ///   4   12  20  28
+        ///   5   13  21  29 
+        /// </summary>
+        /// <returns></returns>
+        int GetSelectedBank()
         {
-            //Use the Set Flash Freq to control frequency of blink
-            //Key Index for XK-24 (in decimal)
-            //Columns-->
-            //  0   8   16  24
-            //  1   9   17  25
-            //  2   10  18  26
-            //  3   11  19  27
-            //  4   12  20  28
-            //  5   13  21  29
-
-
-            if (selecteddevice != -1)
+            string sindex = CboBL.Text;
+            int iindex;
+            if (sindex.IndexOf("b1") != -1) //bank 1 backlight
             {
-                //first get selected index
-                string sindex = CboBL.Text;
-                int iindex;
-                if (sindex.IndexOf("-b1") != -1) //bank 1 backlights
-                {
-                    sindex = sindex.Remove(sindex.IndexOf("-b1"), 3);
-                    iindex = Convert.ToInt16(sindex);
-                }
-                else //bank 2 backlight
-                {
-                    sindex = sindex.Remove(sindex.IndexOf("-b2"), 3);
-                    iindex = Convert.ToInt16(sindex) + 32;  //Add 32 to get corresponding bank 2 index
-                }
-
-                for (int j = 0; j < devices[selecteddevice].WriteLength; j++)
-                {
-                    wData[j] = 0;
-                }
-                //now get state
-                int state = 0;
-                if (ChkBLOnOff.Checked == true)
-                {
-                    if (ChkFlash.Checked == true) state = 2;
-                    else state = 1;
-                }
-
-                wData[1] = 181; //b5
-                wData[2] = (byte)(iindex); //Key Index
-                wData[3] = (byte)state; //0=off, 1=on, 2=flash
-
-                int result = 404;
-                while (result == 404) { result = devices[selecteddevice].WriteData(wData); }
-
-                if (result != 0)
-                {
-                    toolStripStatusLabel1.Text = "Write Fail: " + result;
-                }
-                else
-                {
-                    toolStripStatusLabel1.Text = "Write Success - Flash BL";
-                }
+                sindex = sindex.Remove(sindex.IndexOf("-b1"), 3);
+                iindex = Convert.ToInt16(sindex);
             }
+            else //bank 2 backlight
+            {
+                sindex = sindex.Remove(sindex.IndexOf("-b2"), 3);
+                iindex = Convert.ToInt16(sindex) + 32;  //Add 32 to get corresponding bank 2 backlight
+            }
+
+            return iindex;
         }
 
 
@@ -122,212 +86,90 @@ namespace PIHidDotName_Csharp_Sample
             //  3   11  19  27
             //  4   12  20  28
             //  5   13  21  29
-            if (selecteddevice != -1)
-            {
-                //first get selected index
-                string sindex = CboBL.Text;
-                int iindex;
-                if (sindex.IndexOf("b1") != -1) //bank 1 backlight
-                {
-                    sindex = sindex.Remove(sindex.IndexOf("-b1"), 3);
-                    iindex = Convert.ToInt16(sindex);
-                }
-                else //bank 2 backlight
-                {
-                    sindex = sindex.Remove(sindex.IndexOf("-b2"), 3);
-                    iindex = Convert.ToInt16(sindex) + 32;  //Add 32 to get corresponding bank 2 backlight
-                }
+            //first get selected index
+            int iindex = GetSelectedBank();
 
-                for (int j = 0; j < devices[selecteddevice].WriteLength; j++)
-                {
-                    wData[j] = 0;
-                }
-                //now get state
-                int state = 0;
-                if (ChkFlash.Checked == true)
-                {
-                    state = 2;
-                }
-                else
-                {
-                    if (ChkBLOnOff.Checked == true)
-                    {
-                        state = 1;
-                    }
-                }
+            //now get state 0=off, 1=on, 2=flash
+            int state = ChkFlash.Checked ? 2 : ChkBLOnOff.Checked ? 1 : 0;
 
-                wData[1] = 181; //b5
-                wData[2] = (byte)(iindex); //Key Index
-                wData[3] = (byte)state; //0=off, 1=on, 2=flash
+            int? result = CurrentDevice?.SetBtnLED(state, (byte)iindex);
 
-                int result = 404;
-                while (result == 404) { result = devices[selecteddevice].WriteData(wData); }
-
-                if (result != 0)
-                {
-                    toolStripStatusLabel1.Text = "Write Fail: " + result;
-                }
-                else
-                {
-                    toolStripStatusLabel1.Text = "Write Success - Flash BL";
-                }
-            }
+            ShowResult(result, "Flash BL");
         }
+
+
+        /// <summary>
+        /// Same as above
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ChkBLOnOff_CheckedChanged(object sender, EventArgs e) => ChkFlash_CheckedChanged(sender, e);
+
 
 
         private void BtnSetFlash_Click(object sender, EventArgs e)
         {
             //Sets the frequency of flashing for both the LEDs and backlighting
-            if (selecteddevice != -1) //do nothing if not enumerated
-            {
+            byte freq = (byte)(Convert.ToInt16(TxtFlashFreq.Text));
+            int? result = CurrentDevice?.SetFlashFrequency(freq);
+
+            ShowResult(result, "Set Flash Frequency");
+        }
 
 
-                for (int j = 0; j < devices[selecteddevice].WriteLength; j++)
-                {
-                    wData[j] = 0;
-                }
+        /// <summary>
+        /// Turns on or off, depending on value of ChkGreenOnOff, ALL green BLs using current intensity
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ChkBlueOnOff_CheckedChanged(object sender, EventArgs e)
+        {
+            // OR turn individual rows on or off using bits.  1st bit=row 1, 2nd bit=row 2, 3rd bit =row 3, etc
+            int sl = ChkBlueOnOff.Checked ? 255 : 0;
+            // 0 for Blue, 1 for Red
+            int? result = CurrentDevice?.SetBankOnOff(0, (byte)sl);
 
-                wData[0] = 0;
-                wData[1] = 180; // 0xb4
-                wData[2] = (byte)(Convert.ToInt16(TxtFlashFreq.Text));
+            ShowResult(result, "All Green BL on/off");
+        }
 
-                int result = 404;
-                while (result == 404) { result = devices[selecteddevice].WriteData(wData); }
 
-                if (result != 0)
-                {
-                    toolStripStatusLabel1.Text = "Write Fail: " + result;
-                }
-                else
-                {
-                    toolStripStatusLabel1.Text = "Write Success - Set Flash Frequency";
-                }
-            }
+        /// <summary>
+        /// Turns on or off, depending on value of ChkRedOnOff, ALL red BLs using current intensity
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ChkRedOnOff_CheckedChanged(object sender, EventArgs e)
+        {
+            // OR turn individual rows on or off using bits.  1st bit=row 1, 2nd bit=row 2, 3rd bit =row 3, etc
+            int sl = ChkRedOnOff.Checked ? 255 : 0;
+            // 0 for Blue, 1 for Red
+            int? result = CurrentDevice?.SetBankOnOff(1, (byte)sl);
+
+            ShowResult(result, "All Red BL on/off");
         }
 
 
         private void BtnBL_Click(object sender, EventArgs e)
         {
-            if (selecteddevice != -1) //do nothing if not enumerated
-            {
-                for (int j = 0; j < devices[selecteddevice].WriteLength; j++)
-                {
-                    wData[j] = 0;
-                }
+            byte bank1 = (byte)(Convert.ToInt16(TxtIntensity.Text)); ; //0-255 for brightness of bank 1 bl leds
+            byte bank2 = (byte)(Convert.ToInt16(TxtIntensity2.Text)); ; //0-255 for brightness of bank 2 bl leds
+            int? result = CurrentDevice?.SetBankBrightness(bank1, bank2);
 
-                wData[0] = 0;
-                wData[1] = 187;
-                wData[2] = (byte)(Convert.ToInt16(TxtIntensity.Text)); ; //0-255 for brightness of bank 1 bl leds
-                wData[3] = (byte)(Convert.ToInt16(TxtIntensity2.Text)); ; //0-255 for brightness of bank 2 bl leds
-
-                int result = 404;
-                while (result == 404) { result = devices[selecteddevice].WriteData(wData); }
-
-                if (result != 0)
-                {
-                    toolStripStatusLabel1.Text = "Write Fail: " + result;
-                }
-                else
-                {
-                    toolStripStatusLabel1.Text = "Write Success-Backlighting Intensity";
-                }
-            }
+            ShowResult(result, "Backlighting Intensity");
         }
 
 
-        private void ChkBlueOnOff_CheckedChanged(object sender, EventArgs e)
-        {
-            //Turns on or off, depending on value of ChkGreenOnOff, ALL green BLs using current intensity
-            if (selecteddevice != -1) //do nothing if not enumerated
-            {
-                byte sl = 0;
-
-                if (ChkBlueOnOff.Checked == true) sl = 255;
-                for (int j = 0; j < devices[selecteddevice].WriteLength; j++)
-                {
-                    wData[j] = 0;
-                }
-
-                wData[0] = 0;
-                wData[1] = 182; //0xb6
-                wData[2] = 0;  //0 for Blue, 1 for Red
-                wData[3] = (byte)sl; //OR turn individual rows on or off using bits.  1st bit=row 1, 2nd bit=row 2, 3rd bit =row 3, etc
-
-                int result = 404;
-                while (result == 404) { result = devices[selecteddevice].WriteData(wData); }
-
-                if (result != 0)
-                {
-                    toolStripStatusLabel1.Text = "Write Fail: " + result;
-                }
-                else
-                {
-                    toolStripStatusLabel1.Text = "Write Success-All Green BL on/off";
-                }
-            }
-        }
-
-
-        private void ChkRedOnOff_CheckedChanged(object sender, EventArgs e)
-        {
-            //Turns on or off, depending on value of ChkRedOnOff, ALL red BLs using current intensity
-            if (selecteddevice != -1) //do nothing if not enumerated
-            {
-                byte sl = 0;
-
-                if (ChkRedOnOff.Checked == true) sl = 255;
-                for (int j = 0; j < devices[selecteddevice].WriteLength; j++)
-                {
-                    wData[j] = 0;
-                }
-
-                wData[0] = 0;
-                wData[1] = 182; //0xb6
-                wData[2] = 1;  //0 for Green, 1 for Red
-                wData[3] = (byte)sl; //OR turn individual rows on or off using bits.  1st bit=row 1, 2nd bit=row 2, 3rd bit =row 3, etc
-
-                int result = 404;
-                while (result == 404) { result = devices[selecteddevice].WriteData(wData); }
-
-                if (result != 0)
-                {
-                    toolStripStatusLabel1.Text = "Write Fail: " + result;
-                }
-                else
-                {
-                    toolStripStatusLabel1.Text = "Write Success-All Red BL on/off";
-                }
-            }
-        }
-
-
+        /// <summary>
+        /// Write current state of backlighting to EEPROM.  
+        /// NOTE: Is it not recommended to do this frequently as there are a finite number of writes to the EEPROM allowed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BtnSaveBL_Click(object sender, EventArgs e)
         {
-            //Write current state of backlighting to EEPROM.  
-            //NOTE: Is it not recommended to do this frequently as there are a finite number of writes to the EEPROM allowed
-            if (selecteddevice != -1)
-            {
+            int? result = CurrentDevice?.SaveBacklighting();
 
-                for (int j = 0; j < devices[selecteddevice].WriteLength; j++)
-                {
-                    wData[j] = 0;
-                }
-                wData[0] = 0;
-                wData[1] = 199;
-                wData[2] = 1; //anything other than 0 will save bl state to eeprom, default is 0
-
-                int result = 404;
-                while (result == 404) { result = devices[selecteddevice].WriteData(wData); }
-
-                if (result != 0)
-                {
-                    toolStripStatusLabel1.Text = "Write Fail: " + result;
-                }
-                else
-                {
-                    toolStripStatusLabel1.Text = "Write Success - Save Backlight to EEPROM";
-                }
-            }
+            ShowResult(result, "Save Backlight to EEPROM");
         }
     }
 }

@@ -191,6 +191,66 @@ namespace PIHidDotName_Csharp_Sample
 
 
         /// <summary>
+        /// Sets the frequency of flashing for both the LEDs and backlighting
+        /// </summary>
+        /// <param name="freq"></param>
+        /// <returns></returns>
+        public int SetFlashFrequency(byte freq)
+        {
+            return WriteData(0, 180, freq);
+        }
+
+
+        /// <summary>
+        /// Turns on or off, depending on value of ChkRedOnOff, ALL red/blue BLs using current intensity
+        /// 
+        /// </summary>
+        /// <param name="which">0 for Blue, 1 for Red</param>
+        /// <param name="onoff">
+        /// 0 or 255
+        /// OR turn individual rows on or off using bits.  1st bit=row 1, 2nd bit=row 2, 3rd bit =row 3, etc
+        /// </param>
+        /// <returns></returns>
+        public int SetBankOnOff(int which, byte onoff)
+        {
+            return WriteData(0, 182, (byte)which, onoff);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bank1">0-255 for brightness of bank 1 bl leds</param>
+        /// <param name="bank2">0-255 for brightness of bank 2 bl leds</param>
+        /// <returns></returns>
+        public int SetBankBrightness(byte bank1, byte bank2)
+        {
+            return WriteData(0, 187, bank1, bank2);
+        }
+
+
+        /// <summary>
+        /// 181 (b5)
+        /// Use the Set Flash Freq to control frequency of blink
+        //Key Index for XK-24 (in decimal)
+        //Columns-->
+        //  0   8   16  24
+        //  1   9   17  25
+        //  2   10  18  26
+        //  3   11  19  27
+        //  4   12  20  28
+        //  5   13  21  29
+        /// </summary>
+        /// <param name="ctrl">0=off, 1=on, 2=flash</param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public int SetBtnLED(int ctrl, byte index)
+        {
+            return WriteData(0, 181, index, (byte)ctrl);
+        }
+
+
+        /// <summary>
         /// Sending this command toggles the backlights
         /// </summary>
         /// <returns></returns>
@@ -206,16 +266,24 @@ namespace PIHidDotName_Csharp_Sample
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        public int RedLED()
+        //public int RedLED()
+        //{
+        //    //save the current value of the LED byte
+        //    byte saveled = wData[2]; 
+        //    return WriteData(0, 186, (byte)(saveled | 128));
+        //}
+
+
+        /// <summary>
+        /// Write current state of backlighting to EEPROM.  
+        /// NOTE: Is it not recommended to do this frequently as 
+        /// there are a finite number of writes to the EEPROM allowed
+        /// </summary>
+        /// <returns></returns>
+        public int SaveBacklighting()
         {
-            byte saveled = wData[2]; //save the current value of the LED byte
-
-            Clear();
-
-            wData[1] = 186;
-            wData[2] = (byte)(saveled | 128);
-
-            return WriteData();
+            // anything other than 0 will save bl state to eeprom, default is 0
+            return WriteData(0, 199, 1);
         }
 
 
