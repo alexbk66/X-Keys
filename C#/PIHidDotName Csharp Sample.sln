@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\.gitignore = ..\.gitignore
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PIEDeviceEx", "PIEDeviceEx\PIEDeviceEx.csproj", "{BE1FFF7D-C829-4030-B49C-9D6EA301BD76}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{FD2EC5EF-060C-4FC4-8C1A-2DA08768AF55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD2EC5EF-060C-4FC4-8C1A-2DA08768AF55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD2EC5EF-060C-4FC4-8C1A-2DA08768AF55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE1FFF7D-C829-4030-B49C-9D6EA301BD76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE1FFF7D-C829-4030-B49C-9D6EA301BD76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE1FFF7D-C829-4030-B49C-9D6EA301BD76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE1FFF7D-C829-4030-B49C-9D6EA301BD76}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

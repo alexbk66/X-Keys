@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 
 using PIEHid32Net;
+using PIEDeviceLib;
 
 
 namespace PIHidDotName_Csharp_Sample

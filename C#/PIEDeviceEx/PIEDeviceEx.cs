@@ -5,7 +5,7 @@ using System.Text;
 
 using PIEHid32Net;
 
-namespace PIHidDotName_Csharp_Sample
+namespace PIEDeviceLib
 {
     public class PIEDeviceEx : IDisposable, PIEDataHandler, PIEErrorHandler
     {
@@ -108,15 +108,6 @@ namespace PIHidDotName_Csharp_Sample
         }
 
 
-        public static List<PIEDeviceEx> EnumeratePIE()
-        {
-            return PIEDevice.EnumeratePIE()?
-                   .Where(dev => _IsValid(dev))
-                   .Select(dev => new PIEDeviceEx(dev))
-                   .ToList();
-        }
-
-
         public void Dispose()
         {
             Dispose(true);
@@ -162,6 +153,15 @@ namespace PIHidDotName_Csharp_Sample
 
 
         #region Methods
+
+
+        public static List<PIEDeviceEx> EnumeratePIE()
+        {
+            return PIEDevice.EnumeratePIE()?
+                   .Where(dev => _IsValid(dev))
+                   .Select(dev => new PIEDeviceEx(dev))
+                   .ToList();
+        }
 
 
         public void SetupCallback()

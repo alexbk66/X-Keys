@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 
 using PIEHid32Net;
-
+using PIEDeviceLib;
 
 namespace PIHidDotName_Csharp_Sample
 {
