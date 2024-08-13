@@ -74,10 +74,12 @@ namespace PIEDeviceLib
                 this.error = error;
             }
 
-            public MessageEventArgs(byte[] data, int? error = null)
+            public MessageEventArgs(byte[] data, int? error = null, Button? button = null, DataStruct? data_struct = null)
             {
                 this.data = data;
                 this.error = error;
+                this.button = button;
+                this.data_struct = data_struct;
             }
 
             public string msg { get; set; }
@@ -85,6 +87,10 @@ namespace PIEDeviceLib
             public Byte[] data { get; set; }
                 
             public int? error { get; set; }
+
+            public Button? button { get; set; }
+
+            public DataStruct? data_struct { get; set; }
         }
 
 
@@ -221,13 +227,14 @@ namespace PIEDeviceLib
                 Button? changed = data_struct.Changed(old_data_struct);
 
                 old_data_struct = data_struct;
+            
+                OnMessage?.Invoke(sourceDevice, new MessageEventArgs(data, error, changed, data_struct));
             }
             catch (Exception ex)
             {
                 OnError?.Invoke(this, new MessageEventArgs($"Exception: {ex}"));
             }
 
-        //    OnMessage?.Invoke(sourceDevice, new MessageEventArgs(data, error));
         }
 
 

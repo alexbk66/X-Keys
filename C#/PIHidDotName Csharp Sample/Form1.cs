@@ -12,7 +12,7 @@ using PIEDeviceLib;
 
 namespace PIHidDotName_Csharp_Sample
 {
-    public partial class Form1 : Form, PIEDataHandler, PIEErrorHandler
+    public partial class Form1 : Form //, PIEDataHandler, PIEErrorHandler
     {
         #region 0
 

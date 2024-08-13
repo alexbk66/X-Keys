@@ -23,6 +23,11 @@ namespace PIEDeviceLib
         public int keynum;
         public int c;
         public int r;
+
+        public override string ToString()
+        {
+            return $"Button {keynum}: {(down ? "down" : "up")}, state {state}";
+        }
     }
 
 
@@ -51,13 +56,19 @@ namespace PIEDeviceLib
 
 
         byte b0;
-        byte uid;
+        public byte uid;
         // "switch up"/"switch down"
-        byte SwitchPos;
+        public byte SwitchPos;
 
+        public long absolutetime;
+
+        // Calculated in Changed()
+        public long? deltatime;
+
+        /// <summary>
+        /// Array of buttons states (down/up)
+        /// </summary>
         bool[] buttons;
-
-        long absolutetime;
 
 
         /// <summary>
@@ -74,13 +85,13 @@ namespace PIEDeviceLib
             // check the switch byte 
             SwitchPos = (byte)(data[2] & 1);
 
-
             // time stamp info 4 bytes //ms
             // This code is just mental
             //absolutetime = 16777216 * data[7] + 65536 * data[8] + 256 * data[9] + data[10]; 
 
             byte[] tb = data.Skip(7).Take(4).Reverse().ToArray();
             absolutetime = BitConverter.ToUInt32(tb, 0);
+            deltatime = null;
 
             // Overwrite original 30"
             int numbuttons = maxcols * maxrows;
@@ -165,8 +176,18 @@ namespace PIEDeviceLib
         }
 
 
+        /// <summary>
+        /// Find which button state changed
+        /// </summary>
+        /// <param name="prev"></param>
+        /// <returns></returns>
         public Button? Changed(DataStruct? prev)
         {
+            if (prev != null)
+            {
+                deltatime = absolutetime - ((DataStruct)prev).absolutetime;
+            }
+
             Debug.Assert(buttons != null);
 
             for (int i = 0; i < buttons.Length; i++)

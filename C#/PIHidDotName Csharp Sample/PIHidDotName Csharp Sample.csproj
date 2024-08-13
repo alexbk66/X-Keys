@@ -63,9 +63,6 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Form_Callback.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Form_New.cs">
       <SubType>Form</SubType>
     </Compile>
